@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Vocab Crusher (Projector)</title>
+  <style>
+    :root{
+      --paper:#fbf6dc;
+      --gold:#f6c84f;
+      --gold2:#f2b93a;
+      --ink:#111;
+      --panel:#fff3c2;
+      --panel2:#ffe7b3;
+      --shadow: 0 10px 30px rgba(0,0,0,.18);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    .wrap{max-width:1400px;margin:0 auto;padding:14px 14px 28px;}
+    .banner{
+      background: var(--gold);
+      border: 3px solid #000;
+      border-radius: var(--radius);
+      padding: 18px 18px 10px;
+      text-align:center;
+      box-shadow: var(--shadow);
+    }
+
+    /* --- Title (your current stacked “crush” look) --- */
+    .titleWrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      line-height:.85;
+      padding: 4px 0 2px;
+    }
+    .titleTop{
+      font-size: clamp(70px, 8vw, 120px);
+      font-weight: 1000;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+      transform: rotate(-1deg);
+      text-shadow:
+        6px 6px 0 #000,
+        12px 12px 0 rgba(0,0,0,.25);
+      margin-bottom:-12px;
+      position: relative;
+      z-index: 2;
+    }
+    .titleBottom{
+      font-size: clamp(45px, 5vw, 80px);
+      font-weight: 1000;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      transform: scaleY(.6) skewX(-10deg);
+      text-shadow:
+        3px 3px 0 #000,
+        7px 7px 0 rgba(0,0,0,.35);
+      position: relative;
+      z-index: 1;
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr;
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .card{
+      background: var(--panel);
+      border: 3px solid #000;
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      min-height: 210px;
+    }
+
+    .settings .row{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      align-items:center;
+      padding: 8px 0;
+      border-bottom: 2px dashed rgba(0,0,0,.18);
+    }
+    .settings .row:last-child{border-bottom:0}
+    .label{
+      font-weight: 900;
+      font-size: 18px;
+      letter-spacing:.2px;
+    }
+    select, input[type="number"]{
+      width:100%;
+      font-size: 18px;
+      padding: 10px 12px;
+      border: 2px solid #000;
+      border-radius: 12px;
+      background:#fff;
+    }
+
+    .spinZone{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    /* --- Game-show-ish SMASH button --- */
+    .spinBtn{
+      width: min(380px, 85%);
+      aspect-ratio: 1 / 1;
+      border-radius: 50%;
+      border: 14px solid #f6c84f;
+      background:
+        radial-gradient(circle at 30% 25%, #ff5a5a, #d60000 65%, #990000 100%);
+      color:#fff;
+      font-weight: 1000;
+      letter-spacing: 4px;
+      font-size: clamp(40px, 5vw, 68px);
+      cursor:pointer;
+      text-transform: uppercase;
+      user-select:none;
+      box-shadow:
+        0 0 0 4px #000,
+        0 20px 40px rgba(0,0,0,.35);
+      transform: translateY(-6px);
+      transition: transform .08s ease, filter .15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .spinBtn::before{
+      content:"";
+      position:absolute;
+      top:-30%;
+      left:-30%;
+      width:160%;
+      height:160%;
+      background: radial-gradient(circle,
+                  rgba(255,255,255,.35) 0%,
+                  rgba(255,255,255,.1) 35%,
+                  rgba(255,255,255,0) 60%);
+      pointer-events:none;
+    }
+    .spinBtn:active{
+      transform: translateY(4px) scale(.97);
+      filter: brightness(1.08);
+    }
+
+    .spinBtn:focus-visible {
+      outline: none;
+    }
+    .spinBtn.hit{
+      animation: smashBounce 220ms ease-out;
+    }
+    @keyframes smashBounce{
+      0%{ transform: translateY(-6px) scale(1); }
+      40%{ transform: translateY(-10px) scale(1.05); }
+      70%{ transform: translateY(-4px) scale(.98); }
+      100%{ transform: translateY(-6px) scale(1); }
+    }
+
+    /* Directions banner */
+    .dirBanner{
+      background: var(--gold2);
+      border: 3px solid #000;
+      border-radius: 14px;
+      padding: 10px 12px;
+      display:flex;
+      justify-content: center;
+      align-items:center;
+      gap: 10px;
+      font-weight: 1000;
+      text-transform: uppercase;
+      letter-spacing: .4px;
+    }
+    .dirBannerMode{
+      font-weight: 1000;
+    }
+
+    .directionsBox{
+      background: var(--panel2);
+      border: 3px solid #000;
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    /* Directions text should NOT be bold */
+    .dirText{
+      font-size: clamp(18px, 1.6vw, 24px);
+      line-height: 1.25;
+      font-weight: 700;
+      white-space:pre-line;
+      margin-top: 10px;
+    }
+
+    .toggle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      font-size:16px;
+    }
+    .toggle input{ transform: scale(1.3); }
+
+    .scoreMini{
+      background: rgba(0,0,0,.05);
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 14px;
+      padding-top: 12px;
+      border-top: 2px dashed rgba(0,0,0,.18);
+      font-size: 16px;
+      line-height: 1.6;
+      font-weight: 700;
+      white-space: pre-line;
+    }
+    .hidden{ display:none !important; }
+
+    .wordsRow{
+      margin-top:14px;
+      background: var(--gold);
+      border: 3px solid #000;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      box-shadow: var(--shadow);
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 12px;
+      align-items:center;
+      transform-origin: center;
+    }
+    .wordsLabel{
+      font-weight: 1000;
+      font-size: 26px;
+    }
+    .words{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: space-evenly;
+      align-items:center;
+    }
+    .pill{
+      background:#fff;
+      border: 3px solid #000;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-size: clamp(18px, 2.1vw, 30px);
+      font-weight: 900;
+      box-shadow: 0 6px 0 rgba(0,0,0,.15);
+      max-width: 32ch;
+      text-align:center;
+      opacity: 1;
+    }
+
+    /* --- COOL SMASH MOMENT: tiny shake on the Words bar --- */
+    .wordsRow.smash-shake{
+      animation: wordsShake 180ms ease-out;
+    }
+    @keyframes wordsShake{
+      0%{ transform: translateX(0); }
+      15%{ transform: translateX(-6px); }
+      35%{ transform: translateX(7px); }
+      55%{ transform: translateX(-5px); }
+      75%{ transform: translateX(4px); }
+      100%{ transform: translateX(0); }
+    }
+
+    /* --- COOL SMASH MOMENT: staggered “pop-in” for each pill --- */
+    .pill.pop{
+      opacity: 0;
+      animation: pillPop 220ms ease-out forwards;
+    }
+    @keyframes pillPop{
+      0%{ opacity: 0; transform: translateY(6px) scale(.92); }
+      60%{ opacity: 1; transform: translateY(-2px) scale(1.04); }
+      100%{ opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Teacher strip */
+    .teacher{
+      margin-top:14px;
+      background:#fff;
+      border: 3px solid #000;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px;
+    }
+    .teacherTop{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:10px;
+    }
+    .teacherTop .hint{ font-weight:800; opacity:.8; }
+    textarea{
+      width:100%;
+      min-height:120px;
+      font-size:16px;
+      padding:10px 12px;
+      border:2px solid #000;
+      border-radius: 12px;
+      resize: vertical;
+    }
+    .btnRow{
+      margin-top:10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .btn{
+      border: 2px solid #000;
+      background: var(--gold);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor:pointer;
+    }
+    .btn.secondary{
+      background:#eee;
+    }
+    .btn:active{ transform: translateY(1px); }
+
+    .kbd{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      border:1px solid #000;
+      padding:2px 6px;
+      border-radius:6px;
+      background:#f6f6f6;
+      font-weight:800;
+    }
+    /* ADD THIS RIGHT BELOW */
+    .shortcut-pair {
+    white-space: nowrap;
+    } 
+
+    /* Projector mode */
+    body.projector .teacher{ display:none; }
+    body.projector .wrap{ padding-bottom: 18px; }
+
+    /* Floating projector toggle (always visible) */
+    .floatToggle{
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9999;
+      border: 2px solid #000;
+      background: #fff;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 1000;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      user-select: none;
+    }
+    .floatToggle:active{ transform: translateY(1px); }
+
+    /* Help button (small ? next to projector) */
+    .helpBtn{
+      position: fixed;
+      top: 12px;
+      right: 160px; /* adjust if needed */
+      z-index: 9999;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 2px solid #000;
+      background:#fff;
+      font-weight: 1000;
+      font-size: 22px;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+      user-select:none;
+    }
+    /* Help modal overlay */
+    .helpModal{
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      background: rgba(0,0,0,.45);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    } 
+
+    .helpCard{
+      width: min(720px, 96vw);
+      background: #fff;
+      border: 3px solid #000;
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    .helpHead{
+      background: var(--gold2);
+      border-bottom: 3px solid #000;
+      padding: 10px 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+    }
+
+    .helpTitle{
+      font-weight: 1000;
+      letter-spacing:.2px;
+    }
+
+    .helpClose{
+      border: 2px solid #000;
+      background:#fff;
+      border-radius: 10px;
+      padding: 6px 10px;
+      font-weight: 1000;
+      cursor:pointer;   
+    }   
+    .helpClose:active{ transform: translateY(1px); }
+
+    .helpBody{
+      padding: 14px 16px 16px;
+      font-size: 16px;
+      line-height: 1.5;
+      font-weight: 700;
+    }
+
+    .helpLine{ margin: 6px 0; }
+
+    .helpRule{
+      border: 0;
+      border-top: 2px dashed rgba(0,0,0,.25);
+      margin: 12px 0;
+    }
+
+    .helpFine{
+      margin-top: 10px;
+      font-size: 13px;
+      opacity: .8;
+      font-weight: 700;
+    }
+
+    .teacherFooter{
+      margin-top: 14px;
+      padding-top: 10px;
+      border-top: 2px dashed rgba(0,0,0,.15);
+      font-size: 13px;
+      text-align: right;
+      line-height: 1.2;
+      opacity: .65;
+      font-weight: 700;
+    }
+
+    .teacherFooter .toolName{
+      letter-spacing: .3px;
+    }
+
+    .teacherFooter .toolBy{
+      font-weight: 600;
+    }
+    .helpBtn:active{ transform: translateY(1px); }
+  </style>
+</head>
+
+<body>
+  <button class="floatToggle" id="floatProjectorBtn" title="P = toggle projector">
+    Projector View
+  </button>
+
+  <button class="helpBtn" id="helpBtn" title="Help">
+  ?
+  </button>
+
+  <div class="helpModal hidden" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="helpCard">
+    <div class="helpHead">
+      <div id="helpTitle" class="helpTitle">Vocab Crusher — Quick Help</div>
+      <button class="helpClose" id="helpClose" aria-label="Close">✕</button>
+    </div>
+
+    <div class="helpBody">
+      <div class="helpLine"><b>1)</b> Paste your terms (one per line)</div>
+      <div class="helpLine"><b>2)</b> Click <b>Enter List</b></div>
+      <div class="helpLine"><b>3)</b> Press <b>Space</b> (or click <b>SMASH</b>)</div>
+
+      <hr class="helpRule" />
+
+      <div class="helpLine"><span class="kbd">Space</span> Smash</div>
+      <div class="helpLine"><span class="kbd">P</span> Toggle Projector View</div>
+      <div class="helpLine"><span class="kbd">S</span> Scoring</div>
+
+      <hr class="helpRule" />
+
+      <div class="helpFine">
+        Saves your list only in your browser (localStorage). No accounts. No uploads.
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="wrap">
+    <div class="banner">
+      <div class="titleWrap">
+        <div class="titleTop">VOCAB</div>
+        <div class="titleBottom">CRUSHER</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <!-- LEFT: Settings + scoring mini -->
+      <div class="card settings">
+        <div class="row">
+          <div class="label">Mode</div>
+          <select id="mode">
+            <option value="connection">Connection Crusher</option>
+            <option value="story">Story Mode</option>
+            <option value="outlier">Which Doesn’t Belong?</option>
+            <option value="eli5">Explain Like I’m 5</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <div class="label">Words</div>
+          <input id="count" type="number" min="2" max="8" value="4" />
+        </div>
+
+        <div class="row">
+          <div class="label">Scoring</div>
+          <label class="toggle" style="justify-content:flex-start">
+            <input id="showScoring" type="checkbox" checked />
+            <span>Show</span>
+          </label>
+        </div>
+
+        <div id="scoreMini" class="scoreMini"></div>
+      </div>
+
+      <!-- MIDDLE: Smash -->
+      <div class="card spinZone">
+        <button class="spinBtn" id="spin" title="Space = Smash">SMASH</button>
+      </div>
+
+      <!-- RIGHT: Directions -->
+      <div class="directionsBox">
+        <div class="dirBanner">
+          <span id="dirTitle" class="dirBannerMode">WHICH DOESN’T BELONG?</span>
+        </div>
+
+        <div id="dirText" class="dirText"></div>
+
+        <div style="margin-top:auto;opacity:.75;font-weight:800">
+          Shortcuts:
+          <span class="kbd">Space</span> Smash
+          <span class="kbd">S</span> Scoring   
+          <span class="shortcut-pair">
+          <span class="kbd">P</span> Toggle Projector View
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="wordsRow" id="wordsRow">
+      <div class="wordsLabel">Words:</div>
+      <div id="words" class="words"></div>
+    </div>
+
+    <div class="teacher">
+      <div class="teacherTop">
+        <div class="hint">
+          Paste words (one per line). Then click <b>Enter List</b>.
+        </div>
+        <div style="opacity:.75;font-weight:800">
+          Tip: press <span class="kbd">P</span> for projector mode.
+        </div>
+        <div class="teacherFooter">
+          <div class="toolName">Vocab Crusher</div>
+          <div class="toolBy">Built by Michael K. Milton</div>
+        </div>
+      </div>
+
+      <textarea id="input" placeholder="Paste words here (one per line)..."></textarea>
+
+      <div class="btnRow">
+        <button class="btn secondary" id="copyLink">Copy Link</button>
+        <button class="btn secondary" id="clearList">Clear</button>
+        <button class="btn" id="build">Enter List</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const MODES = {
+      connection: {
+        title: "CONNECTION CRUSHER",
+        directions:
+          "Explain how as many of these terms as possible are connected. " +
+          "Be specific. The stronger and clearer the connection, the better.",
+        scoring:
+          "1 pt = each clear, accurate connection\n" +
+          "+1 bonus = connect a term beyond the list (real-world example, additional concept, etc.)"
+      },
+      story: {
+        title: "STORY MODE",
+        directions:
+          "Write a short story, explanation, or scenario that correctly uses as many of the given terms as possible. " +
+          "Aim for accuracy and intrigue.",
+        scoring:
+          "1 pt = each correct use\n" +
+          "+1 = uses all terms\n" +
+          "+1 = creativity bonus"
+      },
+      outlier: {
+        title: "WHICH DOESN’T BELONG?",
+        directions:
+          "Identify the term that doesn’t belong and explain your reasoning. " +
+          "Then explain what connects the remaining terms.",
+        scoring:
+          "1 pt = identify the outlier\n" +
+          "2 pts = strong reasoning\n" +
+          "3 pts = clearly connect the remaining terms"
+      },
+      eli5: {
+        title: "EXPLAIN LIKE I’M 5",
+        directions:
+          "Explain these terms in very simple language or with analogies so someone unfamiliar with the topic could understand them.",
+        scoring:
+          "1 pt = each clear, simple explanation\n" +
+          "2 pts = strong analogy\n" +
+          "+1 = real-world example"
+      }
+    };
+
+    let WORD_BANK = [];
+
+    // ✅ Per-tab storage key (prevents multiple tabs from overwriting each other)
+    function getTabKey() {
+      let id = sessionStorage.getItem("vocabCrusherTabId");
+      if (!id) {
+        id = Math.random().toString(36).slice(2, 10);
+        sessionStorage.setItem("vocabCrusherTabId", id);
+      }
+      return `vocabCrusherWords_${id}`;
+    }
+
+const WORDS_KEY = getTabKey();
+    const els = {
+      mode: document.getElementById("mode"),
+      count: document.getElementById("count"),
+      smashBtn: document.getElementById("spin"),
+      wordsRow: document.getElementById("wordsRow"),
+      words: document.getElementById("words"),
+      dirTitle: document.getElementById("dirTitle"),
+      dirText: document.getElementById("dirText"),
+      showScoring: document.getElementById("showScoring"),
+      scoreMini: document.getElementById("scoreMini"),
+      input: document.getElementById("input"),
+      build: document.getElementById("build"),
+      copyLink: document.getElementById("copyLink"),
+      helpBtn: document.getElementById("helpBtn"),
+      helpModal: document.getElementById("helpModal"),
+      helpClose: document.getElementById("helpClose"),
+      clearList: document.getElementById("clearList"),
+      floatProjectorBtn: document.getElementById("floatProjectorBtn")
+    };
+
+    function uniqClean(lines){
+      const seen = new Set();
+      const out = [];
+      for (const raw of lines){
+        const w = raw.trim();
+        if(!w) continue;
+        const key = w.toLowerCase();
+        if(seen.has(key)) continue;
+        seen.add(key);
+        out.push(w);
+      }
+      return out;
+    }
+
+    function pickRandom(arr, n){
+      const copy = arr.slice();
+      for(let i=copy.length-1; i>0; i--){
+        const j = Math.floor(Math.random() * (i+1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy.slice(0, Math.min(n, copy.length));
+    }
+
+    function renderWords(list){
+      els.words.innerHTML = "";
+      if(list.length === 0){
+        els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
+        return;
+      }
+
+      function clearList(){
+        WORD_BANK = [];
+        els.input.value = "";
+        renderWords([]); // shows your friendly placeholder
+        localStorage.removeItem(WORDS_KEY);
+        // (optional) clear share hash too
+        history.replaceState(null, "", location.pathname + location.search);
+
+        const original = els.clearList.textContent;
+        els.clearList.textContent = "Cleared ✓";
+        els.clearList.disabled = true;
+        setTimeout(() => {
+          els.clearList.textContent = original;
+          els.clearList.disabled = false;
+        }, 800);
+      }
+
+els.clearList.addEventListener("click", clearList);
+      
+      list.forEach((w, idx) => {
+        const div = document.createElement("div");
+        div.className = "pill pop";
+        div.textContent = w;
+        div.style.animationDelay = `${idx * 85}ms`;
+        els.words.appendChild(div);
+      });
+    }
+
+    function applyMode(){
+      const m = MODES[els.mode.value];
+      els.dirTitle.textContent = m.title;
+      els.dirText.textContent = m.directions;
+
+      // scoring mini lives under checkbox
+      els.scoreMini.innerHTML = m.scoring
+        .split("\n")
+        .map(line => {
+          const parts = line.split("=");
+          if(parts.length === 2){
+            return `<strong>${parts[0].trim()}</strong> = ${parts[1].trim()}`;
+          }
+          return line;
+        })
+        .join("<br>");
+
+      if(!els.showScoring.checked){
+        els.scoreMini.classList.add("hidden");
+      } else {
+        els.scoreMini.classList.remove("hidden");
+      }
+    }
+    function openHelp(){
+      els.helpModal.classList.remove("hidden");
+    }
+
+    function closeHelp(){
+      els.helpModal.classList.add("hidden");
+    }
+
+    // --- Share Link helpers (hash-based, no server needed) ---
+    function toBase64Url(str){
+      const utf8 = encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, (_, p1) =>
+        String.fromCharCode(parseInt(p1, 16))
+      );
+      const b64 = btoa(utf8);
+      return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    }
+
+    function fromBase64Url(b64url){
+      let b64 = b64url.replace(/-/g, "+").replace(/_/g, "/");
+      while(b64.length % 4) b64 += "=";
+      const bin = atob(b64);
+      const pct = Array.from(bin, c =>
+        "%" + c.charCodeAt(0).toString(16).padStart(2, "0")
+      ).join("");
+      return decodeURIComponent(pct);
+    }
+
+    function updateUrlFromBank(){
+      if(!WORD_BANK || WORD_BANK.length === 0) return;
+      const payload = WORD_BANK.join("\n");
+      const encoded = toBase64Url(payload);
+      window.location.hash = `set=${encoded}`;
+    }
+
+    function tryLoadFromUrl(){
+      const hash = (window.location.hash || "").replace(/^#/, "");
+      if(!hash.startsWith("set=")) return false;
+
+      const encoded = hash.slice(4);
+      if(!encoded) return false;
+
+      try{
+        const decoded = fromBase64Url(encoded);
+        const lines = decoded.split(/\r?\n/);
+        WORD_BANK = uniqClean(lines);
+        els.input.value = WORD_BANK.join("\n");
+        localStorage.setItem("vocabCrusherWords", JSON.stringify(WORD_BANK));
+        return WORD_BANK.length > 0;
+      }catch(e){
+        return false;
+      }
+    }
+
+    async function copyShareLink(){
+      // Ensure URL reflects current list
+      updateUrlFromBank();
+      const url = window.location.href;
+
+      const original = els.copyLink.textContent;
+      try{
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          await navigator.clipboard.writeText(url);
+        } else {
+          // fallback
+          window.prompt("Copy this link:", url);
+        }
+        els.copyLink.textContent = "Copied ✓";
+      }catch(e){
+        window.prompt("Copy this link:", url);
+        els.copyLink.textContent = "Copied ✓";
+      }
+
+      els.copyLink.disabled = true;
+      setTimeout(() => {
+        els.copyLink.textContent = original;
+        els.copyLink.disabled = false;
+      }, 900);
+    }
+
+    function buildFromTextarea(){
+  const lines = els.input.value.split(/\r?\n/);
+  WORD_BANK = uniqClean(lines);
+  localStorage.setItem(WORDS_KEY, JSON.stringify(WORD_BANK));
+
+
+  // 🚫 Not enough terms safeguard
+  if (WORD_BANK.length < 2) {
+    const originalText = els.build.textContent;
+    els.build.textContent = "Need 2+ terms";
+    els.build.disabled = true;
+
+    setTimeout(() => {
+      els.build.textContent = originalText;
+      els.build.disabled = false;
+    }, 900);
+
+    return; // stop here — no smash, no success message
+  }
+
+  // ✅ Success feedback
+  const originalText = els.build.textContent;
+  els.build.textContent = "Entered ✓";
+  els.build.disabled = true;
+
+  setTimeout(() => {
+    els.build.textContent = originalText;
+    els.build.disabled = false;
+  }, 900);
+
+  // ✅ Auto-smash after building
+  smash();
+}
+
+    function doSmashEffects(){
+      els.smashBtn.classList.remove("hit");
+      void els.smashBtn.offsetWidth;
+      els.smashBtn.classList.add("hit");
+
+      els.wordsRow.classList.remove("smash-shake");
+      void els.wordsRow.offsetWidth;
+      els.wordsRow.classList.add("smash-shake");
+    }
+
+    function smash(){
+      const n = Math.max(2, Math.min(8, Number(els.count.value || 4)));
+      els.count.value = n;
+
+      if(WORD_BANK.length < 2){
+        renderWords([]);
+        return;
+      }
+
+      doSmashEffects();
+      renderWords(pickRandom(WORD_BANK, n));
+    }
+
+    function loadSaved(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(WORDS_KEY) || "[]");
+        if(Array.isArray(saved) && saved.length){
+          WORD_BANK = saved;
+          els.input.value = saved.join("\n");
+        }
+      }catch(e){}
+    }
+
+    function setProjectorButtonLabel(){
+      const isProj = document.body.classList.contains("projector");
+      if(isProj){
+        els.floatProjectorBtn.textContent = "Projector View";
+      } else {
+        els.floatProjectorBtn.textContent = "Teacher View";
+      }
+    }
+
+    function toggleProjector(){
+      document.body.classList.toggle("projector");
+      setProjectorButtonLabel();
+    }
+
+    // Events
+    els.mode.addEventListener("change", applyMode);
+    els.showScoring.addEventListener("change", applyMode);
+
+    els.build.addEventListener("click", buildFromTextarea);
+    els.copyLink.addEventListener("click", copyShareLink);
+
+    els.smashBtn.addEventListener("click", smash);
+    els.floatProjectorBtn.addEventListener("click", toggleProjector);
+    els.helpBtn.addEventListener("click", openHelp);
+    els.helpClose.addEventListener("click", closeHelp);
+
+    // Close when clicking the dark overlay (but not the card)
+    els.helpModal.addEventListener("click", (e) => {
+      if(e.target === els.helpModal) closeHelp();
+    });
+
+    // Keyboard shortcuts (outside inputs)
+    window.addEventListener("keydown", (e) => {
+      const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
+      if(tag === "textarea" || tag === "input" || tag === "select") return;
+
+      if(e.code === "Space"){ e.preventDefault(); smash(); }
+      if(e.key.toLowerCase() === "p"){ toggleProjector(); }
+      if(e.key.toLowerCase() === "s"){
+        els.showScoring.checked = !els.showScoring.checked;
+        applyMode();
+        if(e.key === "Escape") closeHelp();
+      }
+    });
+
+    els.input.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      buildFromTextarea();
+      }
+    });
+    // Init
+    applyMode();
+
+    // Priority: URL set > localStorage
+    const loadedFromUrl = tryLoadFromUrl();
+    if(!loadedFromUrl) loadSaved();
+
+    setProjectorButtonLabel();
+    if(WORD_BANK.length) {
+      renderWords(pickRandom(WORD_BANK, Number(els.count.value || 4)));
+    } else {
+      renderWords([]);
+    }
+  </script>
+</body>
+</html>
