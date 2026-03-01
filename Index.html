@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Vocab Crusher - Classroom Vocab Warm-Up Tool </title>
-  <meta name="description" content="A fast classroom vocabulary warm-up tool. Paste your list, project, choose a mode, hit SMASH, and spark student connections.">  <style>
+  <meta name="description" content="A fast, projector-ready classroom vocabulary warm-up tool. Paste your list, choose a mode, hit SMASH, and spark whole-class discussion and student connections.">  <style>
     :root{
       --paper:#fbf6dc;
       --gold:#f6c84f;
@@ -66,7 +66,14 @@
       position: relative;
       z-index: 1;
     }
-
+    .tagline{
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      opacity: .85;
+      letter-spacing: .3px;
+    }
+    
     .grid{
       margin-top:14px;
       display:grid;
@@ -300,6 +307,13 @@
       box-shadow: var(--shadow);
       padding: 12px;
     }
+    .teacherHeader{
+      font-weight: 1000;
+      font-size: 18px;
+      margin-bottom: 10px;
+      letter-spacing: .4px;
+    }
+    
     .teacherTop{
       display:flex;
       gap:12px;
@@ -452,6 +466,12 @@
       margin: 12px 0;
     }
 
+    .helpSectionTitle{
+      font-weight: 900;
+      margin-bottom: 6px;
+      margin-top: 4px;
+    }
+
     .helpFine{
       margin-top: 10px;
       font-size: 13px;
@@ -510,8 +530,18 @@
 
       <hr class="helpRule" />
 
+      <div class="helpSectionTitle">Ways to Use This in Class</div>
+      
+      <div class="helpLine">• Whole-class discussion (projected at front)</div>
+      <div class="helpLine">• Think–Pair–Share</div>
+      <div class="helpLine">• Small group competition</div>
+      <div class="helpLine">• Quick-write warm-up</div>
+      <div class="helpLine">• Exit ticket</div>
+      
+      <hr class="helpRule" />
+
       <div class="helpFine">
-        Saves your list only in your browser (localStorage). No accounts. No uploads.
+       Word lists stay in your browser (no accounts, no uploads). To reuse or share one, click Copy List Link in the Teacher Setup section.
       </div>
     </div>
   </div>
@@ -523,8 +553,14 @@
         <div class="titleTop">VOCAB</div>
         <div class="titleBottom">CRUSHER</div>
       </div>
+
+       <div class="tagline">
+        A Whole-Class Vocabulary Warm-Up Tool<br>
+        Designed for projection and discussion.
+      </div>
     </div>
 
+    
     <div class="grid">
       <!-- LEFT: Settings + scoring mini -->
       <div class="card settings">
@@ -584,6 +620,8 @@
     </div>
 
     <div class="teacher">
+      <div class="teacherHeader">Teacher Setup</div>
+      
       <div class="teacherTop">
         <div class="hint">
           Paste words (one per line). Then click <b>Enter List</b>.
@@ -600,7 +638,7 @@
       <textarea id="input" placeholder="Paste words here (one per line)..."></textarea>
 
       <div class="btnRow">
-        <button class="btn secondary" id="copyLink">Copy Link</button>
+        <button class="btn secondary" id="copyLink">Copy List Link</button>
         <button class="btn secondary" id="clearList">Clear</button>
         <button class="btn" id="build">Enter List</button>
       </div>
@@ -631,10 +669,10 @@
       outlier: {
         title: "WHICH DOESN’T BELONG?",
         directions:
-          "Identify the term that doesn’t belong and explain your reasoning. " +
+          "Identify the term(s) that doesn’t belong and explain your reasoning. " +
           "Then explain what connects the remaining terms.",
         scoring:
-          "1 pt = identify the outlier\n" +
+          "1 pt = identify the outlier(s)\n" +
           "2 pts = strong reasoning\n" +
           "3 pts = clearly connect the remaining terms"
       },
