@@ -67,11 +67,11 @@
       z-index: 1;
     }
     .tagline{
-      margin-top: 10px;
-      font-size: 16px;
+      margin-top: 8px;
+      font-size: 15px;
       font-weight: 600;
-      opacity: .85;
-      letter-spacing: .3px;
+      opacity: .78;
+      letter-spacing: .25px;
     }
     
     .grid{
@@ -749,25 +749,24 @@ const WORDS_KEY = getTabKey();
         els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
         return;
       }
-
-      function clearList(){
-        WORD_BANK = [];
-        els.input.value = "";
-        renderWords([]); // shows your friendly placeholder
-        localStorage.removeItem(WORDS_KEY);
-        // (optional) clear share hash too
-        history.replaceState(null, "", location.pathname + location.search);
-
-        const original = els.clearList.textContent;
-        els.clearList.textContent = "Cleared ✓";
-        els.clearList.disabled = true;
-        setTimeout(() => {
-          els.clearList.textContent = original;
-          els.clearList.disabled = false;
-        }, 800);
-      }
-
-els.clearList.addEventListener("click", clearList);
+    function clearList(){
+      WORD_BANK = [];
+      els.input.value = "";
+      renderWords([]); // shows your friendly placeholder
+      localStorage.removeItem(WORDS_KEY);
+    
+      // clear share hash too
+      history.replaceState(null, "", location.pathname + location.search);
+    
+      const original = els.clearList.textContent;
+      els.clearList.textContent = "Cleared ✓";
+      els.clearList.disabled = true;
+    
+      setTimeout(() => {
+        els.clearList.textContent = original;
+        els.clearList.disabled = false;
+      }, 800);
+    }
       
       list.forEach((w, idx) => {
         const div = document.createElement("div");
@@ -847,7 +846,8 @@ els.clearList.addEventListener("click", clearList);
         const lines = decoded.split(/\r?\n/);
         WORD_BANK = uniqClean(lines);
         els.input.value = WORD_BANK.join("\n");
-        localStorage.setItem("vocabCrusherWords", JSON.stringify(WORD_BANK));
+        localStorage.setItem(WORDS_KEY, JSON.stringify(WORD_BANK));
+        
         return WORD_BANK.length > 0;
       }catch(e){
         return false;
@@ -881,9 +881,10 @@ els.clearList.addEventListener("click", clearList);
     }
 
     function buildFromTextarea(){
-  const lines = els.input.value.split(/\r?\n/);
-  WORD_BANK = uniqClean(lines);
-  localStorage.setItem(WORDS_KEY, JSON.stringify(WORD_BANK));
+      const lines = els.input.value.split(/\r?\n/);
+      WORD_BANK = uniqClean(lines);
+      localStorage.setItem(WORDS_KEY, JSON.stringify(WORD_BANK));
+      updateUrlFromBank();
 
 
   // 🚫 Not enough terms safeguard
@@ -967,7 +968,8 @@ els.clearList.addEventListener("click", clearList);
 
     els.build.addEventListener("click", buildFromTextarea);
     els.copyLink.addEventListener("click", copyShareLink);
-
+    els.clearList.addEventListener("click", clearList);
+    
     els.smashBtn.addEventListener("click", smash);
     els.floatProjectorBtn.addEventListener("click", toggleProjector);
     els.helpBtn.addEventListener("click", openHelp);
@@ -982,13 +984,12 @@ els.clearList.addEventListener("click", clearList);
     window.addEventListener("keydown", (e) => {
       const tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : "";
       if(tag === "textarea" || tag === "input" || tag === "select") return;
-
+      if(e.key === "Escape") closeHelp();
       if(e.code === "Space"){ e.preventDefault(); smash(); }
       if(e.key.toLowerCase() === "p"){ toggleProjector(); }
       if(e.key.toLowerCase() === "s"){
         els.showScoring.checked = !els.showScoring.checked;
         applyMode();
-        if(e.key === "Escape") closeHelp();
       }
     });
 
