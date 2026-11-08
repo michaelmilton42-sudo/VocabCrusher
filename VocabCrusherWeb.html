@@ -730,6 +730,7 @@ function clearList(){
   renderWords([]);
 
   localStorage.removeItem(WORDS_KEY);
+  localStorage.removeItem("vocabCrusherWords");
 history.replaceState(null, "", location.pathname);
   
   const original = els.clearList.textContent;
