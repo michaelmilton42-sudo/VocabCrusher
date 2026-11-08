@@ -705,29 +705,47 @@ const WORDS_KEY = getTabKey();
       return copy.slice(0, Math.min(n, copy.length));
     }
 
-    function renderWords(list){
-      els.words.innerHTML = "";
-      if(list.length === 0){
-        els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
-        return;
-      }
+    
+function renderWords(list){
+  els.words.innerHTML = "";
 
-      function clearList(){
-        WORD_BANK = [];
-        els.input.value = "";
-        renderWords([]); // shows your friendly placeholder
-        localStorage.removeItem(WORDS_KEY);
-        // (optional) clear share hash too
-        history.replaceState(null, "", location.pathname + location.search);
+  if(list.length === 0){
+    els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
+    return;
+  }
 
-        const original = els.clearList.textContent;
-        els.clearList.textContent = "Cleared ✓";
-        els.clearList.disabled = true;
-        setTimeout(() => {
-          els.clearList.textContent = original;
-          els.clearList.disabled = false;
-        }, 800);
-      }
+  list.forEach((w, idx) => {
+    const div = document.createElement("div");
+    div.className = "pill pop";
+    div.textContent = w;
+    div.style.animationDelay = `${idx * 85}ms`;
+    els.words.appendChild(div);
+  });
+}
+
+function clearList(){
+  WORD_BANK = [];
+  els.input.value = "";
+  renderWords([]);
+
+  // Remove saved vocabulary
+  localStorage.removeItem(WORDS_KEY);
+  localStorage.removeItem("vocabCrusherWords");
+
+  // Remove vocabulary from URL without reloading
+  history.replaceState(null, "", location.pathname);
+
+  // Brief confirmation
+  const original = els.clearList.textContent;
+  els.clearList.textContent = "Cleared ✓";
+  els.clearList.disabled = true;
+
+  setTimeout(() => {
+    els.clearList.textContent = original;
+    els.clearList.disabled = false;
+  }, 800);
+}
+
 
 els.clearList.addEventListener("click", clearList);
       
@@ -929,6 +947,7 @@ els.clearList.addEventListener("click", clearList);
 
     els.build.addEventListener("click", buildFromTextarea);
     els.copyLink.addEventListener("click", copyShareLink);
+    els.clearList.addEventListener("click", clearList);
 
     els.smashBtn.addEventListener("click", smash);
     els.floatProjectorBtn.addEventListener("click", toggleProjector);
