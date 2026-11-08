@@ -730,8 +730,8 @@ function clearList(){
   renderWords([]);
 
   localStorage.removeItem(WORDS_KEY);
-  history.replaceState(null, "", location.pathname + location.search);
-
+history.replaceState(null, "", location.pathname);
+  
   const original = els.clearList.textContent;
   els.clearList.textContent = "Cleared ✓";
   els.clearList.disabled = true;
