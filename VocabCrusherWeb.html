@@ -747,16 +747,7 @@ function clearList(){
 }
 
 
-els.clearList.addEventListener("click", clearList);
-      
-      list.forEach((w, idx) => {
-        const div = document.createElement("div");
-        div.className = "pill pop";
-        div.textContent = w;
-        div.style.animationDelay = `${idx * 85}ms`;
-        els.words.appendChild(div);
-      });
-    }
+
 
     function applyMode(){
       const m = MODES[els.mode.value];
