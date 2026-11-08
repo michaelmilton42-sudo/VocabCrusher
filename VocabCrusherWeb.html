@@ -724,7 +724,7 @@ function renderWords(list){
   });
 }
 
-function clearList(){
+function resetVocabCrusher(){
   // Remove vocabulary saved in this tab
   WORD_BANK = [];
   localStorage.removeItem(WORDS_KEY);
@@ -926,7 +926,7 @@ function clearList(){
 
     els.build.addEventListener("click", buildFromTextarea);
     els.copyLink.addEventListener("click", copyShareLink);
-    els.clearList.addEventListener("click", clearList);
+    els.clearList.addEventListener("click", resetVocabCrusher);
 
     els.smashBtn.addEventListener("click", smash);
     els.floatProjectorBtn.addEventListener("click", toggleProjector);
