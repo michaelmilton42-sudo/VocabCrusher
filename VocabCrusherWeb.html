@@ -706,6 +706,7 @@ const WORDS_KEY = getTabKey();
     }
 
     
+
 function renderWords(list){
   els.words.innerHTML = "";
 
@@ -728,14 +729,9 @@ function clearList(){
   els.input.value = "";
   renderWords([]);
 
-  // Remove saved vocabulary
   localStorage.removeItem(WORDS_KEY);
-  localStorage.removeItem("vocabCrusherWords");
+  history.replaceState(null, "", location.pathname + location.search);
 
-  // Remove vocabulary from URL without reloading
-  history.replaceState(null, "", location.pathname);
-
-  // Brief confirmation
   const original = els.clearList.textContent;
   els.clearList.textContent = "Cleared ✓";
   els.clearList.disabled = true;
