@@ -747,38 +747,30 @@ const WORDS_KEY = getTabKey();
     }
 
     function renderWords(list){
-      els.words.innerHTML = "";
-      if(list.length === 0){
-        els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
-        return;
-      }
-    function clearList(){
-      WORD_BANK = [];
-      els.input.value = "";
-      renderWords([]); // shows your friendly placeholder
-      localStorage.removeItem(WORDS_KEY);
-    
-      // clear share hash too
-      history.replaceState(null, "", location.pathname + location.search);
-    
-      const original = els.clearList.textContent;
-      els.clearList.textContent = "Cleared ✓";
-      els.clearList.disabled = true;
-    
-      setTimeout(() => {
-        els.clearList.textContent = original;
-        els.clearList.disabled = false;
-      }, 800);
-    }
-      
-      list.forEach((w, idx) => {
-        const div = document.createElement("div");
-        div.className = "pill pop";
-        div.textContent = w;
-        div.style.animationDelay = `${idx * 85}ms`;
-        els.words.appendChild(div);
-      });
-    }
+  els.words.innerHTML = "";
+
+  if(list.length === 0){
+    els.words.innerHTML = `<div class="pill">Paste words below, then Enter List.</div>`;
+    return;
+  }
+
+  list.forEach((w, idx) => {
+    const div = document.createElement("div");
+    div.className = "pill pop";
+    div.textContent = w;
+    div.style.animationDelay = `${idx * 85}ms`;
+    els.words.appendChild(div);
+  });
+}
+
+function resetVocabCrusher(){
+  WORD_BANK = [];
+
+  localStorage.removeItem(WORDS_KEY);
+  localStorage.removeItem("vocabCrusherWords");
+
+  window.location.replace(window.location.origin + "/");
+}
 
     function applyMode(){
       const m = MODES[els.mode.value];
@@ -971,7 +963,7 @@ const WORDS_KEY = getTabKey();
 
     els.build.addEventListener("click", buildFromTextarea);
     els.copyLink.addEventListener("click", copyShareLink);
-    els.clearList.addEventListener("click", clearList);
+    els.clearList.addEventListener("click", resetVocabCrusher);
     
     els.smashBtn.addEventListener("click", smash);
     els.floatProjectorBtn.addEventListener("click", toggleProjector);
