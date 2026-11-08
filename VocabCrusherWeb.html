@@ -725,22 +725,13 @@ function renderWords(list){
 }
 
 function clearList(){
+  // Remove vocabulary saved in this tab
   WORD_BANK = [];
-  els.input.value = "";
-  renderWords([]);
-
   localStorage.removeItem(WORDS_KEY);
   localStorage.removeItem("vocabCrusherWords");
-history.replaceState(null, "", location.pathname);
-  
-  const original = els.clearList.textContent;
-  els.clearList.textContent = "Cleared ✓";
-  els.clearList.disabled = true;
 
-  setTimeout(() => {
-    els.clearList.textContent = original;
-    els.clearList.disabled = false;
-  }, 800);
+  // Return to the clean website homepage
+  window.location.replace(window.location.origin + "/");
 }
 
 
